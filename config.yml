@@ -1,0 +1,18 @@
+group: apiconnect-staging_asc_api
+query: fields @timestamp, message | filter message like /error_code/ | parse message "* => {\"error_code\":*,\"api\":\"*\",\"endpoint\":\"*\",\"response\":\"*\",\"app_id\":\"*\",\"sub_user_id\":\"*\",\"seller_id\":\"*\"}" as timestamp, error_code, api, endpoint, response, app_id, sub_user_id, seller_id | dedup timestamp
+metrics:
+  process_count_by_host:
+    type: counter
+    description: "Amazon Api Error Metric"
+    labels:
+      [
+        "timestamp",
+        "error_code",
+        "api",
+        "endpoint",
+        "response",
+        "app_id",
+        "sub_app_id",
+        "seller_id",
+      ]
+    value: sessions
