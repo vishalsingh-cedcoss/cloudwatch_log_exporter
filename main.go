@@ -54,10 +54,12 @@ func (e *QueryCollector) Describe(ch chan<- *prometheus.Desc) {
 
 func (e *QueryCollector) Collect(ch chan<- prometheus.Metric) {
 
-	cfg, awsError := config.LoadDefaultConfig(context.TODO(),
-		config.WithRegion("ap-south-1"), // Replace with your AWS region
-		config.WithSharedConfigProfile("amazon"),
-	)
+	// cfg, awsError := config.LoadDefaultConfig(context.TODO(),
+	// 	config.WithRegion("ap-south-1"), // Replace with your AWS region
+	// 	config.WithSharedConfigProfile("amazon"),
+	// )
+
+	cfg, awsError := config.LoadDefaultConfig(context.TODO())
 	if awsError != nil {
 		log.Fatalf("Error loading AWS configuration: %v", awsError)
 	}
@@ -69,7 +71,7 @@ func (e *QueryCollector) Collect(ch chan<- prometheus.Metric) {
 
 	log.Printf("%d",len(logMetric))
 
-	for index, lMetric := range logMetric {
+	for _, lMetric := range logMetric {
 		for name, metric := range yamlConfig.Metrics {
 			// Metric labels
 			labelValues := []string{}
@@ -81,9 +83,9 @@ func (e *QueryCollector) Collect(ch chan<- prometheus.Metric) {
 			// Add metric
 			switch strings.ToLower(metric.Type) {
 			case "counter":
-				ch <- prometheus.MustNewConstMetric(metric.metricDesc, prometheus.CounterValue, float64(index), labelValues...)
+				ch <- prometheus.MustNewConstMetric(metric.metricDesc, prometheus.CounterValue, 1, labelValues...)
 			case "gauge":
-				ch <- prometheus.MustNewConstMetric(metric.metricDesc, prometheus.GaugeValue, float64(index), labelValues...)
+				ch <- prometheus.MustNewConstMetric(metric.metricDesc, prometheus.GaugeValue, 1, labelValues...)
 			default:
 				log.Panicf("Fail to add metric for %s: %s is not valid type", name, metric.Type)
 				continue
